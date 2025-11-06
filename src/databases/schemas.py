@@ -3,10 +3,10 @@ def individual_job(job):
         "id": str(job["id"]),
         "command": job["command"],
         "state": job["state"],
-        "attempts": str(job["attempts"]),
-        "max_retries": str(job["max_retries"]),
-        "created_at": str(job["created_at"]),
-        "updated_at": str(job["updated_at"])
+        "attempts": int(job["attempts"]),
+        "max_retries": int(job["max_retries"]),
+        "created_at": job["created_at"],
+        "updated_at": job["updated_at"]
     }
 
 def all_jobs(jobs):
