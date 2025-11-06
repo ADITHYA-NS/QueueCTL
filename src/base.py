@@ -8,14 +8,11 @@ app = FastAPI()
 router = APIRouter()
 
 
-# Utility for ISO 8601 UTC time
+
 def current_iso_time():
     return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
 
 
-# -------------------------------
-#  GET: List all jobs
-# -------------------------------
 @router.get("/list")
 async def get_all_jobs(state: str | None = None):
     try:
@@ -30,16 +27,12 @@ async def get_all_jobs(state: str | None = None):
         raise HTTPException(status_code=500, detail=f"Fetch Unsuccessful - Error: {e}")
 
 
-# -------------------------------
-#  POST: Enqueue a new job
-# -------------------------------
 @router.post("/enqueue")
 async def add_job(new_job: Job):
     try:
-        # Set ISO time
         if collection.find_one({"id": new_job.id}):
             raise HTTPException( status_code=400, detail=f"A job with id '{new_job.id}' already exists.")
-        now = datetime.utcnow().isoformat() + "Z"  # ISO 8601 UTC time
+        now = datetime.utcnow().isoformat() + "Z" 
         job_data = {
             "id": new_job.id,
             "command": new_job.command,
@@ -50,7 +43,6 @@ async def add_job(new_job: Job):
             "updated_at": new_job.updated_at or now
         }
 
-        # Insert to DB
         response = collection.insert_one(job_data)
         return {"status_code": 200,"status": "Insertion Successful","inserted_id": str(response.inserted_id)}
 
@@ -58,9 +50,7 @@ async def add_job(new_job: Job):
         raise HTTPException(status_code=500, detail=f"Insertion Unsuccessful - Error: {e}")
 
 
-# -------------------------------
-#  PUT: Update a job by its ID
-# -------------------------------
+
 @router.put("/update")
 async def update_job( new_job: Job):
     try:
@@ -68,10 +58,8 @@ async def update_job( new_job: Job):
         if not existing_job:
             raise HTTPException(status_code=404, detail="Updation Unsuccessful - Job doesn't exist")
 
-        # Update timestamp and ID consistency
         new_job.updated_at = current_iso_time()
     
-        # Perform update
         response = collection.update_one({"id": new_job.id}, {"$set": dict(new_job)})
 
         if response.modified_count == 0:
@@ -85,5 +73,4 @@ async def update_job( new_job: Job):
         raise HTTPException(status_code=500, detail=f"Updation Unsuccessful - Error: {e}")
 
 
-# Register router
 app.include_router(router)
