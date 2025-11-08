@@ -7,7 +7,7 @@ def current_iso_time():
 
 class Job(BaseModel):
     id: str
-    command: str
+    command: Optional[str] = None
     state: Optional[str] = "pending"
     attempts: Optional[int] = 0
     max_retries: Optional[int] = 3

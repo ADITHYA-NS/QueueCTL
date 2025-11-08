@@ -3,7 +3,7 @@ from configurations import collection
 from databases.schemas import all_jobs
 from databases.models import Job
 from datetime import datetime, timezone
-from worker import start_workers
+from worker import start_workers, stop_workers
 
 app = FastAPI()
 router = APIRouter()
@@ -54,20 +54,22 @@ async def add_job(new_job: Job):
 
 
 @router.put("/update")
-async def update_job( new_job: Job):
+async def update_job(new_job: Job):
     try:
         existing_job = collection.find_one({"id": new_job.id})
         if not existing_job:
             raise HTTPException(status_code=404, detail="Updation Unsuccessful - Job doesn't exist")
 
-        new_job.updated_at = current_iso_time()
-    
-        response = collection.update_one({"id": new_job.id}, {"$set": dict(new_job)})
+       
+        update_data = {k: v for k, v in new_job.dict().items() if v is not None}
+        update_data["updated_at"] = current_iso_time()
+
+        response = collection.update_one({"id": new_job.id}, {"$set": update_data})
 
         if response.modified_count == 0:
             raise HTTPException(status_code=400, detail="Updation Unsuccessful - No changes were made")
 
-        return {"status_code": 200,"details": "Updation Successful"}
+        return {"status_code": 200, "details": f"Updation Successful for job {new_job.id}"}
 
     except HTTPException:
         raise
@@ -81,7 +83,15 @@ def start_worker(num_workers: int = Query(1, ge=1)):
         return {"status_code": 200,"details": f"Started {num_workers} worker(s) successfully!"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to start workers: {e}")
-
+    
+@router.get("/worker/stop")
+def stop_worker():
+    try:
+        stop_workers()
+        return {"status_code": 200, "details": "Workers Stopped Gracefully"}
+    except Exception as e:
+        return {"detail": f"Failed to stop workers: {str(e)}"}
+   
 
 
 

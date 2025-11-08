@@ -107,6 +107,22 @@ def start(count):
         except requests.exceptions.RequestException as e:
             click.secho(f"Failed to connect to server: {e}", fg="red")
 
+
+@worker.command(help="Stop all running workers gracefully")
+def stop():
+    try:
+        response = requests.get(f"{BASE_URL}/worker/stop")
+        if response.ok:
+            click.secho(response.json().get("message", "Workers stopped!"), fg="green")
+        else:
+            click.secho(f"Error from server: {response.text}", fg="red")
+    except requests.exceptions.ConnectionError:
+        click.secho("Cannot connect to backend server. Is it running?", fg="red")
+    except requests.exceptions.Timeout:
+        click.secho("Server timeout while trying to stop workers.", fg="red")
+    except Exception as e:
+        click.secho(f"Unexpected error: {e}", fg="red")
+
 cli.add_command(worker)
 
 if __name__ == "__main__":

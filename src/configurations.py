@@ -9,3 +9,4 @@ client = MongoClient(uri, tlsCAFile=certifi.where())
 
 db = client.queueCLI
 collection = db["jobs"]
+dlq_collection = db["dlq"]  
