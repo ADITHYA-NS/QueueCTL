@@ -15,7 +15,6 @@ def current_iso_time():
 def schedule(worker_id, base_delay=2):
     try:
         while not stop_event.is_set():
-          
             job = collection.find_one_and_update(
                 {"state": "pending"},
                 {"$set": {
@@ -34,7 +33,8 @@ def schedule(worker_id, base_delay=2):
             click.secho(f"Worker {worker_id} picked job {job['id']} -> {job['command']}", fg="blue")
 
             retries = job.get("attempts", 0)
-            max_retries = job.get("max_retries", 3)
+            # Use the runtime config if job.max_retries is None
+            max_retries = job.get("max_retries", config.get("max_retries", 3))
             base_delay = job.get("base_delay", base_delay)
 
             while retries <= max_retries:
@@ -47,14 +47,13 @@ def schedule(worker_id, base_delay=2):
 
                     if response.returncode == 0:
                         state = "completed"
-                        click.secho(f"Job {job['id']} completed successfully ", fg="green")
+                        click.secho(f"Job {job['id']} completed successfully", fg="green")
                         break
                     else:
                         raise subprocess.CalledProcessError(response.returncode, job["command"])
                 except subprocess.TimeoutExpired:
-                    click.secho(f"Job {job['id']} timed out ", fg="red")
+                    click.secho(f"Job {job['id']} timed out", fg="red")
                     state = "failed"
-
                 except Exception as e:
                     click.secho(f"Error executing job {job['id']}: {e}", fg="red")
                     state = "failed"
@@ -63,50 +62,33 @@ def schedule(worker_id, base_delay=2):
                     retries += 1
                     if retries <= max_retries:
                         delay = min(base_delay ** retries + random.uniform(0, 1), 60)
-                        click.secho(
-                            f"Retry {retries}/{max_retries} for job {job['id']} in {delay:.2f}s...",
-                            fg="yellow"
-                        )
+                        click.secho(f"Retry {retries}/{max_retries} for job {job['id']} in {delay:.2f}s...", fg="yellow")
                         time.sleep(delay)
-                        collection.update_one({"id": job["id"]}, {"$set": {"attempts": retries }})
+                        collection.update_one({"id": job["id"]}, {"$set": {"attempts": retries}})
                         continue
                     else:
                         state = "dead"
-                        job["state"] = state
                         job_copy = dict(job)
-                        job_copy.pop("_id", None) 
-                        if dlq_collection.find_one({"id": job.id}):
-                            click.secho(f"Job with {job.id} already exists in DLQ!!")
-                        else:    
+                        job_copy.pop("_id", None)
+                        if not dlq_collection.find_one({"id": job["id"]}):
                             dlq_collection.insert_one(job_copy)
-
-                        collection.delete_one({"id":job["id"]})
-                        click.secho(f"Job {job['id']} moved to DLQ after {max_retries} retries ", fg="red")
+                        collection.delete_one({"id": job["id"]})
+                        click.secho(f"Job {job['id']} moved to DLQ after {max_retries} retries", fg="red")
                         break
-            
+
             collection.update_one(
                 {"id": job["id"]},
-                {"$set": {
-                    "state": state,
-                    "attempts": retries,
-                    "updated_at": current_iso_time()
-                }}
+                {"$set": {"state": state, "attempts": retries, "updated_at": current_iso_time()}}
             )
-
             click.secho(f"Worker {worker_id} finished job {job['id']} -> Status: {state}", fg="green")
 
     finally:
-        
         updated = collection.update_many(
             {"state": "processing", "worker_assigned": worker_id},
             {"$set": {"state": "failed", "updated_at": current_iso_time()}}
         )
         if updated.modified_count:
-            click.secho(
-                f"Worker {worker_id} crashed — {updated.modified_count} jobs marked as failed ",
-                fg="red"
-            )
-
+            click.secho(f"Worker {worker_id} crashed — {updated.modified_count} jobs marked as failed", fg="red")
 
 
 def start_workers(num_workers):

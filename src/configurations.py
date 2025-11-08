@@ -11,3 +11,7 @@ db = client.queueCLI
 collection = db["jobs"]
 dlq_collection = db["dlq"]  
 
+config = {
+    "max_retries": 3,   # default max retries
+    "base_delay": 2.0,  # default exponential backoff base
+}

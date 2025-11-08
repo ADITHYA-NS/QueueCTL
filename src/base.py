@@ -1,5 +1,5 @@
-from fastapi import FastAPI, APIRouter, HTTPException, Query
-from configurations import collection, dlq_collection
+from fastapi import FastAPI, APIRouter, HTTPException, Query, Body
+from configurations import collection, dlq_collection, config
 from databases.schemas import all_jobs
 from databases.models import Job
 from datetime import datetime, timezone
@@ -8,7 +8,6 @@ import threading
 
 app = FastAPI()
 router = APIRouter()
-
 
 
 def current_iso_time():
@@ -40,7 +39,7 @@ async def add_job(new_job: Job):
             "command": new_job.command,
             "state": new_job.state or "pending",
             "attempts": new_job.attempts or 0,
-            "max_retries": new_job.max_retries or 3,
+            "max_retries": config["max_retries"],
             "created_at": new_job.created_at or now,
             "updated_at": new_job.updated_at or now,
             "worker_assigned": 0
@@ -161,5 +160,19 @@ def retry_dlq_job(job_id: str = Query(..., description="ID of the job to retry f
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to retry job {job_id}: {e}")
-    
+
+
+
+@router.post("/config/set")
+def set_config(key: str = Body(...), value: int = Body(...)):
+    if key not in config:
+        raise HTTPException(status_code=400, detail=f"Invalid config key: {key}")
+    config[key] = value
+    return {"status": "success", "key": key, "value": value}
+
+@router.get("/config/get")
+def get_config(key: str):
+    if key not in config:
+        raise HTTPException(status_code=400, detail=f"Invalid config key: {key}")
+    return {"status": "success", "key": key, "value": config[key]}  
 app.include_router(router)

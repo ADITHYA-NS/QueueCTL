@@ -33,6 +33,10 @@ def dlq():
 def worker():
     pass
 
+@click.group(help="Manage queue configurations")
+def config():
+    pass
+
 @cli.command(help="Add a job to the queue")
 @click.argument("data")
 def enqueue(data):
@@ -196,8 +200,34 @@ def retry(job_id):
 
 
 
+@config.command(help="Set a configuration key")
+@click.argument("key")
+@click.argument("value", type=int)
+def set(key, value):
+    try:
+        response = requests.post(f"{BASE_URL}/config/set", json={"key": key, "value": value})
+        if response.ok:
+            click.secho(f"Config updated: {key} = {value}", fg="green")
+        else:
+            click.secho(f"Error: {response.text}", fg="red")
+    except requests.exceptions.RequestException as e:
+        click.secho(f"Failed to connect to server: {e}", fg="red")
+
+@config.command(help="Get a configuration key")
+@click.argument("key")
+def get(key):
+    try:
+        response = requests.get(f"{BASE_URL}/config/get", params={"key": key})
+        if response.ok:
+            value = response.json().get("value")
+            click.secho(f"{key} = {value}", fg="green")
+        else:
+            click.secho(f"Error: {response.text}", fg="red")
+    except requests.exceptions.RequestException as e:
+        click.secho(f"Failed to connect to server: {e}", fg="red")
+
 cli.add_command(dlq)
 cli.add_command(worker)
-
+cli.add_command(config)
 if __name__ == "__main__":
     cli()
