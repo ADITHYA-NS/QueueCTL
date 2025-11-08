@@ -13,3 +13,4 @@ class Job(BaseModel):
     max_retries: Optional[int] = 3
     created_at: Optional[str] = datetime.utcnow().isoformat() + "Z"
     updated_at: Optional[str] = datetime.utcnow().isoformat() + "Z"
+    worker_assigned: Optional[int] = 0

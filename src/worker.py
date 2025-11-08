@@ -1,7 +1,6 @@
 import subprocess
 from databases.models import Job
 from configurations import collection
-from databases.schemas import all_jobs
 import threading
 import click
 from datetime import datetime, timezone
@@ -38,6 +37,3 @@ def start_workers(num_worker):
     
     for t in threads:
         t.join()
-
-def execute(job: Job):
-    subprocess.run(job.command)

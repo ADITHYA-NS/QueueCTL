@@ -23,14 +23,12 @@ def pretty_print_jobs(jobs):
 
 @click.group()
 def cli():
-    """QueueCTL - Manage your job queue from the CLI."""
     pass
 
 
-@cli.command(help="Enqueue a new job into the queue")
+@cli.command(help="Add a job to the queue")
 @click.argument("data")
 def enqueue(data):
-    """Enqueue a new job"""
     try:
         payload = json.loads(data)
     except json.JSONDecodeError:
@@ -51,7 +49,6 @@ def enqueue(data):
 @cli.command(help="Update an existing job")
 @click.argument("data")
 def update(data):
-    """Update a job by ID"""
     try:
         payload = json.loads(data)
     except json.JSONDecodeError:
@@ -72,7 +69,6 @@ def update(data):
 @cli.command(help="List jobs with optional state filter")
 @click.option("--state", help="Filter by job state (pending, running, completed, etc.)")
 def list(state):
-    """List all jobs or filter by state"""
     try:
         params = {}
         if state:
@@ -90,6 +86,28 @@ def list(state):
     except requests.exceptions.RequestException as e:
         click.secho(f"Failed to connect to server: {e}", fg="red")
 
+
+@click.group(help="Manage and start workers")
+def worker():
+    pass
+
+@worker.command(help="Start worker nodes to execute commands mentioend in each job")
+@click.option("--count", default=1, type=int, help="Number of workers to start")
+def start(count):
+        try:
+            params = {}
+            if count:
+                params["count"] = count
+
+            response = requests.get(f"{BASE_URL}/worker/start", params=params)
+            if response.ok:
+                click.secho(response.json().get("message", "Workers started!"), fg="green")
+            else:
+                click.secho(f"Error: {response.text}", fg="red")
+        except requests.exceptions.RequestException as e:
+            click.secho(f"Failed to connect to server: {e}", fg="red")
+
+cli.add_command(worker)
 
 if __name__ == "__main__":
     cli()

@@ -1,8 +1,9 @@
-from fastapi import FastAPI, APIRouter, HTTPException
+from fastapi import FastAPI, APIRouter, HTTPException, Query
 from configurations import collection
 from databases.schemas import all_jobs
 from databases.models import Job
 from datetime import datetime, timezone
+from worker import start_workers
 
 app = FastAPI()
 router = APIRouter()
@@ -40,7 +41,8 @@ async def add_job(new_job: Job):
             "attempts": new_job.attempts or 0,
             "max_retries": new_job.max_retries or 3,
             "created_at": new_job.created_at or now,
-            "updated_at": new_job.updated_at or now
+            "updated_at": new_job.updated_at or now,
+            "worker_assigned": 0
         }
 
         response = collection.insert_one(job_data)
@@ -71,6 +73,16 @@ async def update_job( new_job: Job):
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Updation Unsuccessful - Error: {e}")
+
+@router.get("/worker/start")
+def start_worker(num_workers: int = Query(1, ge=1)):
+    try:
+        start_workers(num_workers)
+        return {"status_code": 200,"details": f"Started {num_workers} worker(s) successfully!"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to start workers: {e}")
+
+
 
 
 app.include_router(router)

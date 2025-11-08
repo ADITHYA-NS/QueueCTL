@@ -6,7 +6,8 @@ def individual_job(job):
         "attempts": int(job["attempts"]),
         "max_retries": int(job["max_retries"]),
         "created_at": job["created_at"],
-        "updated_at": job["updated_at"]
+        "updated_at": job["updated_at"],
+        "worker_assigned": job["worker_assigned"]
     }
 
 def all_jobs(jobs):
