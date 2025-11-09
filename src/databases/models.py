@@ -10,7 +10,7 @@ class Job(BaseModel):
     command: Optional[str] = None
     state: Optional[str] = "pending"
     attempts: Optional[int] = 0
-    max_retries: Optional[int] = 3
+    max_retries: Optional[int] = None
     created_at: Optional[str] = datetime.utcnow().isoformat() + "Z"
     updated_at: Optional[str] = datetime.utcnow().isoformat() + "Z"
     worker_assigned: Optional[int] = 0

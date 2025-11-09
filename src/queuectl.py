@@ -7,6 +7,7 @@ import builtins
 
 BASE_URL = "http://127.0.0.1:8000"  # FastAPI backend
 
+
 def pretty_print_jobs(jobs):
     """Helper to print job list nicely."""
     click.echo("Job List:")
@@ -16,6 +17,7 @@ def pretty_print_jobs(jobs):
         click.echo(f"Command: {job['command']}")
         click.echo(f"State: {job['state']}")
         click.echo(f"Attempts: {job['attempts']}")
+        click.echo(f"Max Retries: {job['max_retries']}")
         click.echo(f"Created At: {job['created_at']}")
         click.echo(f"Updated At: {job['updated_at']}")
         click.echo("-" * 60)
@@ -50,7 +52,7 @@ def enqueue(data):
         response = requests.post(f"{BASE_URL}/enqueue", json=payload)
         if response.status_code == 200:
             click.secho("Job enqueued successfully!", fg="green")
-            click.echo(response.json())
+            
         else:
             click.secho(f"Error: {response.text}", fg="red")
     except requests.exceptions.RequestException as e:
@@ -70,7 +72,7 @@ def update(data):
         response = requests.put(f"{BASE_URL}/update", json=payload)
         if response.status_code == 200:
             click.secho("Job updated successfully!", fg="green")
-            click.echo(response.json())
+            
         else:
             click.secho(f"Error: {response.text}", fg="red")
     except requests.exceptions.RequestException as e:
@@ -100,6 +102,7 @@ def list(state):
 
 
 
+
 @worker.command(help="Start worker nodes to execute commands mentioend in each job")
 @click.option("--count",  help="Number of workers to start")
 def start(count):
@@ -110,7 +113,7 @@ def start(count):
 
             response = requests.get(f"{BASE_URL}/worker/start", params=params)
             if response.ok:
-                click.secho(response.json().get("message", "Workers started!"), fg="green")
+                click.secho(response.json().get("details", "Workers started!"), fg="green")
             else:
                 click.secho(f"Error cli: {response.text}", fg="red")
             
@@ -118,12 +121,13 @@ def start(count):
             click.secho(f"Failed to connect to server: {e}", fg="red")
 
 
+
 @worker.command(help="Stop all running workers gracefully")
 def stop():
     try:
         response = requests.get(f"{BASE_URL}/worker/stop")
         if response.ok:
-            click.secho(response.json().get("message", "Workers stopped!"), fg="green")
+            click.secho(response.json().get("details", "Workers stopped!"), fg="green")
         else:
             click.secho(f"Error from server: {response.text}", fg="red")
     except requests.exceptions.ConnectionError:
@@ -213,6 +217,7 @@ def set(key, value):
     except requests.exceptions.RequestException as e:
         click.secho(f"Failed to connect to server: {e}", fg="red")
 
+
 @config.command(help="Get a configuration key")
 @click.argument("key")
 def get(key):
@@ -225,6 +230,7 @@ def get(key):
             click.secho(f"Error: {response.text}", fg="red")
     except requests.exceptions.RequestException as e:
         click.secho(f"Failed to connect to server: {e}", fg="red")
+
 
 cli.add_command(dlq)
 cli.add_command(worker)
