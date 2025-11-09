@@ -196,7 +196,7 @@ def retry(job_id):
     try:
         response = requests.post(f"{BASE_URL}/dlq/retry", params={"job_id": job_id})
         if response.ok:
-            click.secho(f"Job {job_id} retried successfully!", fg="green")
+            click.secho(f"Job {job_id} added to original collection successfully!", fg="green")
         else:
             click.secho(f"Error retrying job: {response.text}", fg="red")
     except requests.exceptions.RequestException as e:

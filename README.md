@@ -61,6 +61,7 @@ pip install -r requirements.txt
 ### Step 4: Install CLI Tool
 
 ```bash
+cd src
 pip install -e .
 ```
 
@@ -90,6 +91,9 @@ MONGO_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/?appName=que
 ```bash
 # Make sure virtual environment is activated
 source venv/bin/activate  # or venv\Scripts\activate on Windows
+
+# Move to src folder
+cd src
 
 # Start FastAPI server
 uvicorn base:app --reload
@@ -352,7 +356,20 @@ Visit http://localhost:8000/docs for interactive Swagger UI documentation.
 
 ---
 
-### ✅ **Checklist Before Submission**
+## Test 
+ ```bash
+# Move to test directory
+cd test
+
+# Run a quick test
+bash quick_validation.sh
+
+# Run full tests
+bash test.sh
+
+```
+
+## ✅ **Checklist Before Submission**
 
 - ✅  All required commands functional
 - ✅  Jobs persist after restart
@@ -362,13 +379,18 @@ Visit http://localhost:8000/docs for interactive Swagger UI documentation.
 - ✅  Code is modular and maintainable
 - ✅  Includes test or script verifying main flows
 
-### 🎬 CLI Demo
-Google Drive: 
+---
+
+## 🎬 CLI Demo
+Google Drive: https://1drv.ms/v/c/12da93b45eb2a407/EeP8OPUhdetFqZLM0nG0zCoBRo_w4CMuLcBYp-ETG6bxdQ?e=Mwd8iE
+
+---
 
 ## Author
 
-Adithya N S
+Adithya N S </br>
 Contact: nsadithya004@gmail.com
+
 ---
 
 ## License

@@ -83,7 +83,7 @@ def start_workers(num_workers):
     """
     Start Worker Threads .
     """
-
+    stop_event = threading.Event()
     try:
         for i in range(num_workers):
             time.sleep(random.uniform(0, 0.2))  
@@ -102,7 +102,7 @@ def start_workers(num_workers):
     finally:
         for t in threads:
             t.join()
-        click.secho("All workers stopped after finishing current jobs.", fg="red")
+        click.secho("No pending jobs", fg="red")
 
 
 def stop_workers():
