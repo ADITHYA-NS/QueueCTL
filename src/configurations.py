@@ -6,7 +6,6 @@ import os
 
 load_dotenv()
 MONGO_URI = os.getenv("MONGO_URI")
-#MONGO_URI = "mongodb+srv://adithyaaaig04_db_user:AE233FlFM7ZFmMhY@queuecli.uqfdrhl.mongodb.net/?appName=queueCLI"
 
 # Create a new client and connect to the server
 client = MongoClient(MONGO_URI, tlsCAFile=certifi.where())

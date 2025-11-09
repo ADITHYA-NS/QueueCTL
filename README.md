@@ -34,8 +34,8 @@ A robust job queue system with worker management, retry logic, and Dead Letter Q
 ### Step 1: Clone the Repository
 
 ```bash
-git clone <your-repo-url>
-cd queuectl
+git clone https://github.com/ADITHYA-NS/QueueCTL.git
+cd QueueCTL
 ```
 
 ### Step 2: Create Virtual Environment
@@ -320,17 +320,19 @@ Default settings in `configurations.py`:
 ```
 queuectl/
 ├── base.py                 # FastAPI application & API routes
-├── worker.py              # Worker thread logic and job execution
-├── configurations.py      # MongoDB connection & configuration
-├── queuectl.py           # CLI tool implementation
+├── worker.py               # Worker thread logic and job execution
+├── configurations.py       # MongoDB connection & configuration
+├── queuectl.py             # CLI tool implementation
 ├── databases/
-│   ├── models.py         # Pydantic data models
-│   └── schemas.py        # Data transformation schemas
-├── requirements.txt      # Python dependencies
-├── setup.py             # Package configuration for CLI
-├── .env                # Environment variable template
-├── .gitignore          # Git ignore rules
-└── README.md           # This file
+│   ├── models.py           # Pydantic data models
+│   └── schemas.py          # Data transformation schemas
+├── requirements.txt        # Python dependencies
+├── setup.py                # Package configuration for CLI
+├── .env                    # Environment variable template
+├── tests                   # Bash Scripts to test functionalities
+|   ├── test.sh             # Tests including invalid commands, Long running commands etc
+|   ├── quick_validation.sh # Tests basics functionalities
+└── README.md               # This file
 ```
 ---
 
@@ -360,13 +362,15 @@ Visit http://localhost:8000/docs for interactive Swagger UI documentation.
 - ✅  Code is modular and maintainable
 - ✅  Includes test or script verifying main flows
 
+### 🎬 CLI Demo
+Google Drive: 
+
 ## Author
 
 Adithya N S
-
-
+Contact: nsadithya004@gmail.com
 ---
 
 ## License
 
-MIT License
+This project is licensed under the [MIT License](./LICENSE) © 2025 Adithya N S.
