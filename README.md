@@ -68,12 +68,6 @@ This installs the `queuectl` command globally in your virtual environment.
 
 ### Step 5: Configure Environment Variables
 
-Create a `.env` file in the project root:
-
-```bash
-cp .env.example .env
-```
-
 Edit `.env` and add your MongoDB connection string:
 
 ```env
@@ -240,7 +234,7 @@ queuectl config get max_retries
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | `GET` | `/dlq/list` | List all DLQ jobs |
-| `POST` | `/dlq/retry?job_id=<id>` | Retry a specific DLQ job |
+| `POST` | `/dlq/retry?job_id=<id>` | Adds the specific DLQ job back to the main collection to retry |
 
 ### Configuration
 
@@ -334,7 +328,7 @@ queuectl/
 │   └── schemas.py        # Data transformation schemas
 ├── requirements.txt      # Python dependencies
 ├── setup.py             # Package configuration for CLI
-├── .env.example         # Environment variable template
+├── .env                # Environment variable template
 ├── .gitignore          # Git ignore rules
 └── README.md           # This file
 ```

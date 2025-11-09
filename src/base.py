@@ -103,7 +103,6 @@ def start_worker(num_workers: int = Query(..., description="Number of worker thr
     """
 
     try:
-        
         threading.Thread(target=start_workers, args=(num_workers,), daemon=True).start()
         return {"status_code": 200, "details": f"Started {num_workers} worker(s) successfully!"}
     except Exception as e:

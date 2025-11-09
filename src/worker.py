@@ -8,7 +8,7 @@ import random
 import threading
 
 stop_event = threading.Event()
-
+threads = []
 def current_iso_time():
     return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
 
@@ -83,7 +83,7 @@ def start_workers(num_workers):
     """
     Start Worker Threads .
     """
-    threads = []
+
     try:
         for i in range(num_workers):
             time.sleep(random.uniform(0, 0.2))  
@@ -110,8 +110,10 @@ def stop_workers():
     Stop Workers Gracefully.
     """
     stop_event.set()
-    while threading.active_count() > 1:  
-        time.sleep(0.5)
+    
+    for t in threads:
+        t.join(timeout=3)
+        count += 1
     updated = collection.update_many(
         {"state": "processing"},
         {"$set": {"state": "pending", "updated_at": current_iso_time()}}
