@@ -1,6 +1,6 @@
-# QueueCTL - Distributed Job Queue System
+# QueueCTL - Job Queue System
 
-A robust distributed job queue system with worker management, retry logic, and Dead Letter Queue (DLQ) support built with FastAPI and MongoDB.
+A robust job queue system with worker management, retry logic, and Dead Letter Queue (DLQ) support built with FastAPI and MongoDB.
 
 ## Features
 
