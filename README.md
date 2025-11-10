@@ -382,7 +382,7 @@ bash test.sh
 ---
 
 ## 🎬 CLI Demo
-Google Drive: https://1drv.ms/v/c/12da93b45eb2a407/EeP8OPUhdetFqZLM0nG0zCoBRo_w4CMuLcBYp-ETG6bxdQ?e=Mwd8iE
+Google Drive: https://1drv.ms/v/c/12da93b45eb2a407/EeP8OPUhdetFqZLM0nG0zCoBRo_w4CMuLcBYp-ETG6bxdQ?e=iTwoSD
 
 ---
 
